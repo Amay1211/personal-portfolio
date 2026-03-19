@@ -12,18 +12,18 @@ export const ThreePlaceholder: React.FC = () => {
   const effectRef = useRef<ParallaxBarrierEffect | null>(null);
   const spheresRef = useRef<THREE.Mesh[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
-  const windowHalfRef = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const globalThisHalfRef = useRef({ x: globalThis.innerWidth / 2, y: globalThis.innerHeight / 2 });
 
   useEffect(() => {
-    if (typeof window === "undefined" || !containerRef.current) return;
+    if (typeof globalThis === "undefined" || !containerRef.current) return;
 
     const container = containerRef.current;
     const mouse = mouseRef.current;
-    const windowHalf = windowHalfRef.current;
+    const globalThisHalf = globalThisHalfRef.current;
 
     const camera = new THREE.PerspectiveCamera(
       60,
-      window.innerWidth / window.innerHeight,
+      globalThis.innerWidth / globalThis.innerHeight,
       0.01,
       100
     );
@@ -69,28 +69,28 @@ export const ThreePlaceholder: React.FC = () => {
     spheresRef.current = spheres;
 
     const renderer = new THREE.WebGLRenderer();
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(globalThis.devicePixelRatio);
     renderer.setAnimationLoop(animate);
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    const width = window.innerWidth || 2;
-    const height = window.innerHeight || 2;
+    const width = globalThis.innerWidth || 2;
+    const height = globalThis.innerHeight || 2;
     const effect = new ParallaxBarrierEffect(renderer);
     effect.setSize(width, height);
     effectRef.current = effect;
 
-    function onWindowResize(): void {
-      windowHalf.x = window.innerWidth / 2;
-      windowHalf.y = window.innerHeight / 2;
-      camera.aspect = window.innerWidth / window.innerHeight;
+    function onglobalThisResize(): void {
+      globalThisHalf.x = globalThis.innerWidth / 2;
+      globalThisHalf.y = globalThis.innerHeight / 2;
+      camera.aspect = globalThis.innerWidth / globalThis.innerHeight;
       camera.updateProjectionMatrix();
-      effect.setSize(window.innerWidth, window.innerHeight);
+      effect.setSize(globalThis.innerWidth, globalThis.innerHeight);
     }
 
     function onDocumentMouseMove(event: MouseEvent): void {
-      mouse.x = (event.clientX - windowHalf.x) / 100;
-      mouse.y = (event.clientY - windowHalf.y) / 100;
+      mouse.x = (event.clientX - globalThisHalf.x) / 100;
+      mouse.y = (event.clientY - globalThisHalf.y) / 100;
     }
 
     function animate(): void {
@@ -109,11 +109,11 @@ export const ThreePlaceholder: React.FC = () => {
       effect.render(scene, camera);
     }
 
-    window.addEventListener("resize", onWindowResize);
+    globalThis.addEventListener("resize", onglobalThisResize);
     document.addEventListener("mousemove", onDocumentMouseMove);
 
     return () => {
-      window.removeEventListener("resize", onWindowResize);
+      globalThis.removeEventListener("resize", onglobalThisResize);
       document.removeEventListener("mousemove", onDocumentMouseMove);
       renderer.setAnimationLoop(null);
       if (container.contains(renderer.domElement)) {
