@@ -8,13 +8,14 @@ import { Education } from "./components/education";
 import { Certifications } from "./components/certifications";
 import { Contact } from "./components/contact";
 import { Footer } from "./components/footer";
+import { ThreePlaceholder } from "./components/three-placeholder";
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1">
-        {/* <ThreePlaceholder /> */}
+        <ThreePlaceholder />
         <Hero />
         <About />
         <Skills />
